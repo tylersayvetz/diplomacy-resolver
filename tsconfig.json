@@ -1,0 +1,30 @@
+{
+    "compilerOptions": {
+        "baseUrl": ".",
+        "paths": {
+            "*": [
+                "types/*"
+            ]
+        },
+        "module": "commonjs",
+        "moduleResolution": "Node",
+        "noImplicitAny": true,
+        "removeComments": true,
+        "preserveConstEnums": true,
+        "resolveJsonModule": true,
+        "incremental": true,
+        "sourceMap": true,
+        "target": "es2017",
+        "outDir": "dist/",
+        "rootDir": "src/",
+        "esModuleInterop": true
+    },
+    "include": [
+        "src/**/*",
+        "src/**/*.json"
+    ],
+    "exclude": [
+        "node_modules",
+        "**/*.spec.ts"
+    ]
+}
