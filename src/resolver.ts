@@ -11,12 +11,19 @@ import { isTargettingTerritory } from './util';
 import { OrderType } from './const';
 
 
-//validates the pertinent data for each move type, returning a boolean if the order is illegal or impossible.
+/**
+ * validates the pertinent data for each order type, returning a boolean if the order is illegal or impossible.
+ *  @param order The order to be validated. 
+ */
 export function validateAbstractOrder(order: Order): boolean {
     switch(order.type) {
         case OrderType.MOVE:
             return validateMoveOrder(order);
-        case OrderType.HOLD
+        case OrderType.HOLD:
+            return validateHoldOrder(order);
+        default: {
+            // validate orders based on type.
+        }
     }
 }
 

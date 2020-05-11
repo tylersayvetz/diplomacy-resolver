@@ -12,3 +12,8 @@ export function isTargettingTerritory (order: Order, territory: TerritoryDefinit
 
     return holding || targetting || supporting
 }
+
+//assigns a HOLD order to any unit who was not assigned an order by the player.
+export function assignHoldOrderToNoOp(): void {
+    //might not need this. Depeneding on data structure decisions with the boardStatus. 
+}
