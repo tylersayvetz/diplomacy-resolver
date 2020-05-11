@@ -8,6 +8,18 @@
 
 import { Order, TerritoryDefinition, BoardState } from './types';
 import { isTargettingTerritory } from './util';
+import { OrderType } from './const';
+
+
+//validates the pertinent data for each move type, returning a boolean if the order is illegal or impossible.
+export function validateAbstractOrder(order: Order): boolean {
+    switch(order.type) {
+        case OrderType.MOVE:
+            return validateMoveOrder(order);
+        case OrderType.HOLD
+    }
+}
+
 
 export function deriveInitialBoardStateFromOrders(orders: Order[], territories: TerritoryDefinition[]): BoardState {
 
