@@ -5,17 +5,17 @@ import { deriveInitialBoardStateFromOrders, deriveContestedTerrritoriesFromOrder
 import { expect } from 'chai';
 import { hasNeighbor } from '../util';
 
-//   +---------------+
-//   |       |       |
-//   |  A    |  B    | . <-- name of territory
-//   |       |  C2   | . <--occupying power
-//   |       |       |
-//   +---------------+
-//   |       |       |
-//   |  C    |  D    |
-//   |       |       |
-//   |       |       |
-//   +---------------+
+//   +---------------+----+
+//   |       |       |    |
+//   |  A    |  B    |  E | . <-- name of territory
+//   |       |  C2   |    | . <--occupying power
+//   |       |       |    |
+//   +---------------+    |
+//   |       |       |    |
+//   |  C    |  D    |    |
+//   |       |       |    |
+//   |       |       |    |
+//   +---------------+----+
 
 //final data form example:
 // {
@@ -88,6 +88,16 @@ export const territories: TerritoryDefinition[] = [
       { to: 'C', army: true, fleet: false }
     ],
     coastalNeighbors: null
+  },
+  {
+    name: 'E',
+    type: TerritoryType.LAND,
+    country: countries[0],
+    neighbors: [
+      { to: 'B', army: true, fleet: false },
+      { to: 'D', army: true, fleet: false }
+    ],
+    coastalNeighbors: null
   }
 ];
 
@@ -109,7 +119,8 @@ describe('maps initial board state', () => {
       A: { occupied: false },
       B: { occupied: true },
       C: { occupied: false },
-      D: { occupied: false }
+      D: { occupied: false },
+      E: { occupied: false },
     };
     expect(boardState).to.eql(expectedState);
     
@@ -127,7 +138,8 @@ describe('maps initial board state', () => {
       A: { occupied: false },
       B: { occupied: true },
       C: { occupied: false },
-      D: { occupied: true }
+      D: { occupied: true },
+      E: { occupied: false }
     };
     expect(boardState).to.eql(expectedState);
   });
@@ -144,7 +156,8 @@ describe('maps initial board state', () => {
           A: { occupied: false, contested: false },
           B: { occupied: true, contested: false },
           C: { occupied: true, contested: false },
-          D: { occupied: false, contested: true }
+          D: { occupied: false, contested: true },
+          E: { occupied: false, contested: false }
         };
         expect(boardState).to.eql(expectedState); 
       });
@@ -159,7 +172,9 @@ describe('maps initial board state', () => {
           A: { occupied: false, contested: false },
           B: { occupied: false, contested: false },
           C: { occupied: true, contested: false },
-          D: { occupied: true, contested: true }
+          D: { occupied: true, contested: true },
+          E: { occupied: false, contested: false },
+
         };
         expect(boardState).to.eql(expectedState); 
       });
@@ -174,7 +189,8 @@ describe('maps initial board state', () => {
           A: { occupied: false, contested: false },
           B: { occupied: false, contested: false },
           C: { occupied: true, contested: true },
-          D: { occupied: true, contested: false }
+          D: { occupied: true, contested: false },
+          E: { occupied: false, contested: false }
         };
         expect(boardState).to.eql(expectedState); 
       });
@@ -189,6 +205,7 @@ describe('maps initial board state', () => {
         const order : MoveOrder = { type: OrderType.MOVE, country: 'C1', origin: 'B', target: 'C' } 
         expect(validateAbstractOrder(order, territories)).to.equal(false);
       })
+      
       it('when the order is a support hold and is valid', () => {
         const order : SupportHoldOrder = { type: OrderType.SUPPORT_HOLD, country: 'C1', origin: 'D', target: 'C' } 
         expect(validateAbstractOrder(order, territories)).to.equal(true);
@@ -197,12 +214,13 @@ describe('maps initial board state', () => {
         const order : SupportHoldOrder = { type: OrderType.SUPPORT_HOLD, country: 'C1', origin: 'D', target: 'A' } 
         expect(validateAbstractOrder(order, territories)).to.equal(false);
       })
+      
       it('when the order is a supportMove and is valid', () => {
-        const order : SupportMoveOrder = { type: OrderType.SUPPORT_MOVE, country: 'C1', origin: 'A', target: 'D', into: 'C' } 
-        expect(validateAbstractOrder(order, territories)).to.equal(false);
+        const order : SupportMoveOrder = { type: OrderType.SUPPORT_MOVE, country: 'C1', origin: 'E', target: 'D', into: 'B' } 
+        expect(validateAbstractOrder(order, territories)).to.equal(true);
       })
       it('when the order is a supportMove and is not valid', () => {
-        const order : MoveOrder = { type: OrderType.MOVE, country: 'C1', origin: 'A', target: 'D' } 
+        const order : SupportMoveOrder = { type: OrderType.SUPPORT_MOVE, country: 'C1', origin: 'A', target: 'D', into: 'C' } 
         expect(validateAbstractOrder(order, territories)).to.equal(false);
       })
       
