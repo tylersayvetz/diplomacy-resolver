@@ -1,8 +1,9 @@
 const countries = ['C1', 'C2', 'C3', 'C4'];
 import { TerritoryType, OrderType } from '../const';
-import { TerritoryDefinition, Order } from '../types';
-import { deriveInitialBoardStateFromOrders, deriveContestedTerrritoriesFromOrders } from '../resolver';
+import { TerritoryDefinition, Order, MoveOrder, HoldOrder, SupportHoldOrder, SupportMoveOrder } from '../types';
+import { deriveInitialBoardStateFromOrders, deriveContestedTerrritoriesFromOrders, validateAbstractOrder } from '../resolver';
 import { expect } from 'chai';
+import { hasNeighbor } from '../util';
 
 //   +---------------+
 //   |       |       |
@@ -44,6 +45,9 @@ import { expect } from 'chai';
   }
  */
 
+ /**
+  * Dummy data representing the territories.
+  */
 export const territories: TerritoryDefinition[] = [
   {
     name: 'A',
@@ -174,6 +178,45 @@ describe('maps initial board state', () => {
         };
         expect(boardState).to.eql(expectedState); 
       });
+  });
+
+  describe('validateAbstractOrder()', () => {
+      it('when the order is a move and is valid', () => {
+        const order : MoveOrder = { type: OrderType.MOVE, country: 'C1', origin: 'D', target: 'C' } 
+        expect(validateAbstractOrder(order, territories)).to.equal(true);
+      })
+      it('when the order is a move and is not valid', () => {
+        const order : MoveOrder = { type: OrderType.MOVE, country: 'C1', origin: 'B', target: 'C' } 
+        expect(validateAbstractOrder(order, territories)).to.equal(false);
+      })
+      it('when the order is a support hold and is valid', () => {
+        const order : SupportHoldOrder = { type: OrderType.SUPPORT_HOLD, country: 'C1', origin: 'D', target: 'C' } 
+        expect(validateAbstractOrder(order, territories)).to.equal(true);
+      })
+      it('when the order is a support hold and is not valid', () => {
+        const order : SupportHoldOrder = { type: OrderType.SUPPORT_HOLD, country: 'C1', origin: 'D', target: 'A' } 
+        expect(validateAbstractOrder(order, territories)).to.equal(false);
+      })
+      it('when the order is a supportMove and is valid', () => {
+        const order : SupportMoveOrder = { type: OrderType.SUPPORT_MOVE, country: 'C1', origin: 'A', target: 'D', into: 'C' } 
+        expect(validateAbstractOrder(order, territories)).to.equal(false);
+      })
+      it('when the order is a supportMove and is not valid', () => {
+        const order : MoveOrder = { type: OrderType.MOVE, country: 'C1', origin: 'A', target: 'D' } 
+        expect(validateAbstractOrder(order, territories)).to.equal(false);
+      })
+      
+  });
+
+  describe('hasNeighbor()', () => {
+      it('when it is a valid neighbor', () => {
+          const order = { type: OrderType.MOVE, country: 'C1', origin: 'D', target: 'C' }
+          expect(hasNeighbor(order.origin, order.target, territories)).to.equal(true);
+      })
+      it('when it is not a valid neighbor', () => {
+          const order = { type: OrderType.MOVE, country: 'C1', origin: 'B', target: 'C' }
+          expect(hasNeighbor(order.origin, order.target, territories)).to.equal(false);
+      })
   });
 
 });
