@@ -14,7 +14,10 @@ import {
     validateAbstractOrder
 } from '../resolver';
 import { expect } from 'chai';
-import { hasNeighbor, validMoveByConvoy } from '../util';
+import { hasNeighbor } from '../util/util';
+import { validMoveByConvoy } from '../util/order-validators';
+
+
 
 //   +---------------+----+
 //   |       |  sea  |    |
@@ -103,13 +106,6 @@ export const territories: TerritoryDefinition[] = [
     }
 ];
 
-/**
- * MOVE
- * territory: ORIGIN
- * territory_secondary: TARGET
- * territory_tertiary: null
- */
-
 describe('maps initial board state', () => {
     it('returns a map of the board, showing territories as occupied or not', () => {
         const orders: Order[] = [
@@ -148,91 +144,6 @@ describe('maps initial board state', () => {
             E: { occupied: false }
         };
         expect(boardState).to.eql(expectedState);
-    });
-
-    describe('returns a map of the board showing contested territories.', () => {
-        it('when two countries are moving to the same territory...', () => {
-            const orders: Order[] = [
-                {
-                    type: OrderType.MOVE,
-                    country: 'C2',
-                    origin: 'B',
-                    target: 'D',
-                    unit: UnitType.ARMY
-                },
-                {
-                    type: OrderType.MOVE,
-                    country: 'C1',
-                    origin: 'C',
-                    target: 'D',
-                    unit: UnitType.ARMY
-                }
-            ];
-
-            const boardState = deriveContestedTerrritoriesFromOrders(orders, territories);
-            const expectedState = {
-                A: { occupied: false, contested: false },
-                B: { occupied: true, contested: false },
-                C: { occupied: true, contested: false },
-                D: { occupied: false, contested: true },
-                E: { occupied: false, contested: false }
-            };
-            expect(boardState).to.eql(expectedState);
-        });
-        it('when a country moves into a territory occupied by a holding country...', () => {
-            const orders: Order[] = [
-                { type: OrderType.HOLD, country: 'C2', origin: 'D', unit: UnitType.ARMY },
-                {
-                    type: OrderType.MOVE,
-                    country: 'C1',
-                    origin: 'C',
-                    target: 'D',
-                    unit: UnitType.ARMY
-                }
-            ];
-
-            const boardState = deriveContestedTerrritoriesFromOrders(orders, territories);
-            const expectedState = {
-                A: { occupied: false, contested: false },
-                B: { occupied: false, contested: false },
-                C: { occupied: true, contested: false },
-                D: { occupied: true, contested: true },
-                E: { occupied: false, contested: false }
-            };
-            expect(boardState).to.eql(expectedState);
-        });
-        it('when a country moves into a territory that is support_holding another third territory...', () => {
-            const orders: Order[] = [
-                {
-                    type: OrderType.SUPPORT_HOLD,
-                    country: 'C2',
-                    origin: 'C',
-                    target: 'A',
-                    unit: UnitType.ARMY
-                },
-                {
-                    type: OrderType.MOVE,
-                    country: 'C1',
-                    origin: 'D',
-                    target: 'C',
-                    unit: UnitType.ARMY
-                }
-            ];
-
-            const boardState = deriveContestedTerrritoriesFromOrders(orders, territories);
-            const expectedState = {
-                A: { occupied: false, contested: false },
-                B: { occupied: false, contested: false },
-                C: { occupied: true, contested: true },
-                D: { occupied: true, contested: false },
-                E: { occupied: false, contested: false }
-            };
-            expect(boardState).to.eql(expectedState);
-        });
-
-        it ('when a unit moves into a territory whose order was cancelled, it should be a conflict', () => {
-          //coding this will be......... hmm.
-        });
     });
 
     describe('validateAbstractOrder()', () => {

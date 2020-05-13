@@ -8,13 +8,11 @@
 
 import { Order, TerritoryDefinition, BoardState } from './types';
 import {
-    isTargettingTerritory,
+    isTargettingTerritory
     // validateConvoy,
     // validateHold,
-    validateMove,
-    validateSupportHold,
-    validateSupportMove
-} from './util';
+} from './util/util';
+import { validateMove, validateSupportHold, validateSupportMove } from './util/order-validators';
 import { OrderType } from './const';
 
 /**
@@ -22,7 +20,7 @@ import { OrderType } from './const';
  *  @param order The order to be validated.
  */
 export function validateAbstractOrder(order: Order, territories: TerritoryDefinition[]): boolean {
-    switch (order.type) { 
+    switch (order.type) {
         case OrderType.MOVE:
             return validateMove(order, territories);
         case OrderType.SUPPORT_HOLD:
@@ -30,7 +28,7 @@ export function validateAbstractOrder(order: Order, territories: TerritoryDefini
         case OrderType.SUPPORT_MOVE:
             return validateSupportMove(order, territories);
         // case OrderType.CONVOY:
-            // return validateConvoy(order, territories);
+        // return validateConvoy(order, territories);
         default: {
             return true;
         }
