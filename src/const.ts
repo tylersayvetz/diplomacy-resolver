@@ -13,3 +13,8 @@ export enum OrderType {
     BUILD,
     DESTROY
 }
+
+export enum UnitType {
+    ARMY,
+    FLEET
+}

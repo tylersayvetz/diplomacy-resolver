@@ -1,4 +1,4 @@
-import { TerritoryType, OrderType } from "./const";
+import { TerritoryType, OrderType, UnitType } from "./const";
 
 export interface TerritoryDefinition {
     name: string;
@@ -24,7 +24,8 @@ export interface TerritoryNeighborDefinition {
 export interface AbstractOrder {
     type: OrderType,
     country: string,
-    origin: string;
+    origin: string,
+    unit: UnitType
 }
 
 export interface HoldOrder extends AbstractOrder {

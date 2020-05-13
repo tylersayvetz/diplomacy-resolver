@@ -30,7 +30,7 @@ export function validateAbstractOrder(order: Order, territories: TerritoryDefini
         case OrderType.SUPPORT_MOVE:
             return validateSupportMove(order, territories);
         // case OrderType.CONVOY:
-        //     return validateConvoy(order, territories);
+            // return validateConvoy(order, territories);
         default: {
             return true;
         }
