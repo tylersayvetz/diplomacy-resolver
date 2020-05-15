@@ -1,65 +1,123 @@
-
-
-import { Order, TerritoryDefinition, TerritoryStatus, OrderStatus, Contestant } from "../types";
-import { OrderType } from "../const";
+import { Order, TerritoryDefinition, TerritoryStatus, OrderStatus, Contestant, ConvoyRoute, ConvoyOrder, MoveOrder } from '../types';
+import { OrderType } from '../const';
+import { territoryIsContested, getDefinitionsFromNeighbors } from './util';
+import { validMoveByConvoy } from './order-validators';
+import { territories } from '../tests/orderAdjudicator.test';
 
 export interface BoardState {
-    [territoryName: string]: TerritoryStatus
+    [territoryName: string]: TerritoryStatus;
 }
 
 //build the board state from the orders.
-export function buildTerritoryStatusesFromOrders(orders: Order[], territoryDefinitions: TerritoryDefinition[]): BoardState  {
+export function buildTerritoryStatusesFromOrders(orders: Order[], territoryDefinitions: TerritoryDefinition[]): BoardState {
+    const boardState: BoardState = {};
 
-    const boardState: BoardState = {}
-
+    //things to do for every territory.
     for (const territoryDefinition of territoryDefinitions) {
+        //1. determine contested status
+        const contested = territoryIsContested(territoryDefinition, orders) ? true : false;
+
+        //2. determine the contestants
+        const contestants = orders
+            .filter((order) => order.type === OrderType.MOVE && order.target === territoryDefinition.name)
+            .map<Contestant>((order) => ({
+                // FIXME: handle convoy routes.
+                convoyRoutes: null,
+                territory: boardState[order.origin]
+            }));
+
         boardState[territoryDefinition.name] = {
             territory: territoryDefinition,
-            contested: false,
-            contestants: null,
+            contested,
+            contestants: contested ? contestants : null,
             occupant: null
         };
     }
 
-    const orderStatuses = orders.map<OrderStatus>(order => ({
+    //things to do for every order.
+    //create an orderStatus for every Order.
+    const orderStatuses = orders.map<OrderStatus>((order) => ({
         order,
         resolution: null,
         convoyRoutes: null,
         supports: []
-    }))
+    }));
 
-    //mapping all of the required properties' values on to the boardSTate.
+    //things to do for every OrderStatus
     for (const orderStatus of orderStatuses) {
+        //1. map this orderStatus to 'occupant' on the boardState.
+        //2. find supports to this order.
+        //3. if the type is a convoy, find all of the convoy routes to the target
+
         const orderTerritory = orderStatus.order.origin;
-
-        
-        //set contestants information.
-        const contestants = orders
-            .filter(order => order.type === OrderType.MOVE && order.target === orderTerritory)
-            .map<Contestant>(order => ({
-                // FIXME: handle convoy routes.
-                convoyRoutes: null,
-                territory: boardState[order.origin]
-            }))
-
-        //
-        const supports = orders.filter(order => {
-            //TODO: the next thing I was going to do was....
-            // find all the support moves that affect this orderStatus
-        })
-        
-        //set the information. 
         boardState[orderTerritory].occupant = orderStatus;
-        boardState[orderTerritory].contestants = contestants.length > 0 ? contestants : null;
 
+        //get all supports
+        const supports = orders
+            .filter((order) => {
+                const isSupportingCurrentTerritory =
+                    (order.type === OrderType.SUPPORT_HOLD || order.type === OrderType.SUPPORT_MOVE) &&
+                    order.target === orderTerritory;
+
+                return isSupportingCurrentTerritory;
+            })
+            .map((order) => {
+                return boardState[order.origin];
+            });
+
+        orderStatus.supports = supports;
+
+        //find all convoy routes.
+        if (orderStatus.order.type === OrderType.MOVE && validMoveByConvoy(orderStatus.order, territories)) {
+
+            orderStatus.convoyRoutes = findConvoyRoutes(orderStatus.order, territories, boardState);
+        }
     }
 
-    return boardState
+    return boardState;
 }
 
 
+export function findConvoyRoutes(order: MoveOrder, territories: TerritoryDefinition[], boardState: BoardState): ConvoyRoute[] | null {
 
+    const target = order.target;
+    const home = territories.find(t => t.name == order.origin);
+    const coastalNeighbors = home.coastalNeighbors;
 
+    if (coastalNeighbors === null) return null
+
+    const coastalNeighborDefinitions = getDefinitionsFromNeighbors(coastalNeighbors);
+    const convoyRoutes: ConvoyRoute[] = [];
+
+    for (const neighbor of coastalNeighborDefinitions) {
+        const possible = dfsConvoyRoutes(home, neighbor, target);
+        if (possible) {
+
+            //create a territoryStatus array and push it to the convoyRoutes array.
+        }
+    }
+
+    return convoyRoutes;
+}
+
+export function dfsConvoyRoutes (home: TerritoryDefinition, current: TerritoryDefinition | null, goal: string, route: TerritoryDefinition[] = []): TerritoryDefinition[] | void {
+    //base cases. if the current is the goal OR if there are no coastal neighbors, return current.
+    if (current.name === goal || !current.coastalNeighbors) return;
+
+    const coastalNeighbors = getDefinitionsFromNeighbors(current.coastalNeighbors)  
+        .filter(territory => {
+            return true //FIXME return type is 'convoy' AND target is 'home' AND into is 'goal'.
+        });
+    //get all the neighbors and DFS them.
+    for (const neighbor of coastalNeighbors) {
+        console.log('In DFS', neighbor.name);
+        //FIXME inifinite recursion. uf. needs help
+        //TODO: What I was about to do was: 
+        //finish this search of the territories for valid convoy routes. 
+        
+        dfsConvoyRoutes(home, neighbor, goal, route)
+    }
+}
 
 /*
     psuedo code: 
@@ -102,7 +160,7 @@ export function buildTerritoryStatusesFromOrders(orders: Order[], territoryDefin
         name: <string>,
         contested: <boolean>,
         contestants:  {
-            convoyRoutes?: <Territory[][] | null>
+            convoyRoutes: <Territory[][] | null>
             territory: <Territory> 
         }[]
         occupant: {

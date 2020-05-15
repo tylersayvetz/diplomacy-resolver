@@ -16,17 +16,17 @@ export interface TerritoryStatus {
     occupant: OrderStatus | null;
 }
 
-export type ConvoyRoute = TerritoryStatus[][];
+export type ConvoyRoute = TerritoryStatus[];
 
 export interface Contestant {
-    convoyRoutes?: ConvoyRoute | null;
+    convoyRoutes: ConvoyRoute[] | null;
     territory: TerritoryStatus;
 }
 
 export interface OrderStatus {
     order: Order;
     resolution: boolean | null;
-    convoyRoutes: ConvoyRoute | null;
+    convoyRoutes: ConvoyRoute[] | null;
     supports: TerritoryStatus[];
 }
 
@@ -34,7 +34,7 @@ export interface OrderStatus {
 export interface BoardState {
     [territoryName: string]: {
         occupied: boolean;
-        contested: boolean;
+        contested?: boolean;
     };
 }
 
@@ -49,7 +49,7 @@ export interface AbstractOrder {
     country: string;
     origin: string;
     unit: UnitType;
-    success: boolean;
+    success?: boolean;
 }
 
 export interface HoldOrder extends AbstractOrder {

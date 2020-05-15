@@ -269,5 +269,27 @@ describe('maps initial board state', () => {
             };
             expect(validMoveByConvoy(order, territories)).to.equal(true);
         });
+        it ('returns false for an impossible convoy route', () => {
+            const order: MoveOrder = {
+                type: OrderType.MOVE,
+                country: 'C1',
+                origin: 'E',
+                target: 'C',
+                unit: UnitType.ARMY,
+                success: true
+            };
+            expect(validMoveByConvoy(order, territories)).to.equal(false);
+        });
+        it ('returns true for a move that is also possible without a convoy (adjacent target territory)', () => {
+            const order: MoveOrder = {
+                type: OrderType.MOVE,
+                country: 'C1',
+                origin: 'E',
+                target: 'D',
+                unit: UnitType.ARMY,
+                success: true
+            };
+            expect(validMoveByConvoy(order, territories)).to.equal(true);
+        });
     });
 });

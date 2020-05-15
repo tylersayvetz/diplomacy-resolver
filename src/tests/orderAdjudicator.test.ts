@@ -3,6 +3,7 @@ import { TerritoryType, OrderType, UnitType } from '../const';
 import { TerritoryDefinition, Order, MoveOrder } from '../types';
 import { deriveContestedTerrritoriesFromOrders } from '../resolver';
 import { expect } from 'chai';
+import { buildTerritoryStatusesFromOrders, dfsConvoyRoutes } from '../lib/conflict-adjudicator';
 // . +----------------------------------+-----+
 // . |                                  |     |
 // . |                          sea     |     |
@@ -176,7 +177,7 @@ describe('returns a map of the board showing contested territories.', () => {
                 country: 'C2',
                 origin: 'B',
                 target: 'D',
-                unit: UnitType.ARMY
+                unit: UnitType.ARMY,
             },
             {
                 type: OrderType.MOVE,
@@ -231,7 +232,7 @@ describe('returns a map of the board showing contested territories.', () => {
     });
     it("when a country moves into a territory occupied by it's own holding unit...", () => {
         const orders: Order[] = [
-            { type: OrderType.HOLD, country: 'C1', origin: 'D', unit: UnitType.ARMY },
+            { type: OrderType.HOLD, country: 'C1', origin: 'D',  unit: UnitType.ARMY },
             {
                 type: OrderType.MOVE,
                 country: 'C1',
@@ -295,11 +296,56 @@ describe('returns a map of the board showing contested territories.', () => {
     });
 });
 
-describe('resolveConflictedTerritory()', () => {
-    describe('getRelativeWeight()', () => {
-        it('should return 1 if the order is unsupported MOVE', () => {
-            const order: MoveOrder = { type: OrderType.MOVE, origin: 'A', target: 'B', success: true };
+describe('orderAdjudicator functions', () => {
+    describe('buildTerritoryStatusesFromOrders()', () => {
+        it ('builds the data structure', () => {
+            const orders: Order[] = [
+                {
+                    type: OrderType.MOVE,
+                    country: 'C2',
+                    origin: 'B',
+                    target: 'D',
+                    unit: UnitType.ARMY,
+                },
+                {
+                    type: OrderType.MOVE,
+                    country: 'C1',
+                    origin: 'C',
+                    target: 'D',
+                    unit: UnitType.ARMY
+                },
+                {
+                    type: OrderType.SUPPORT_MOVE,
+                    country: 'C1',
+                    origin: 'E',
+                    target: 'B',
+                    into: 'D',
+                    unit: UnitType.FLEET
+                }
+            ];
+            const boardState = buildTerritoryStatusesFromOrders(orders, territories);
+            console.log('*****', boardState.C)
+            console.log(boardState.B)
+            console.log(boardState.E)
+        });
+    });
 
+    describe('dfsConvoyRoutes()', () => {
+        it ('finds the current number of convoy routes', () => {
+            const orders: Order[] = [
+                {
+                    type: OrderType.MOVE,
+                    country: 'C2',
+                    origin: 'G',
+                    target: 'B',
+                    unit: UnitType.ARMY,
+                    //via I
+                }
+            ];
+
+            const home = territories.find(t => t.name === 'G')
+            //FIXME uf.. infinite loop needs to be resolved. 
+            expect(dfsConvoyRoutes(home, home, 'B' )).to.eql(7)
         });
     });
 });

@@ -1,5 +1,13 @@
-import { Order, TerritoryDefinition, MoveOrder, SupportHoldOrder, SupportMoveOrder } from '../types';
+import {
+    Order,
+    TerritoryDefinition,
+    MoveOrder,
+    SupportHoldOrder,
+    SupportMoveOrder,
+    TerritoryNeighborDefinition
+} from '../types';
 import { OrderType, TerritoryType } from '../const';
+import { territories } from '../tests/orderAdjudicator.test';
 
 export function isTargettingTerritory(order: Order, territory: TerritoryDefinition): boolean {
     //is holding and therefor intends to occupy the territory
@@ -12,12 +20,11 @@ export function isTargettingTerritory(order: Order, territory: TerritoryDefiniti
     return holding || targetting || supporting;
 }
 
-
 // export function validateConvoy(order: Order): boolean {}
 /**
- * 
+ *
  * Determines if an order's origin has an immediate neighbor with its target.
- * 
+ *
  * @param origin name of the origin of the order
  * @param target name of the target of the order
  * @param territories all territories.
@@ -27,11 +34,24 @@ export function hasNeighbor(
     target: string,
     territories: TerritoryDefinition[]
 ): boolean {
-    const currentTerritory = territories.find((t) => t.name === origin)
-    const landNeighbor = currentTerritory.neighbors.find((n) => n.to === target) !== undefined
-    const seaNeighbor = currentTerritory.coastalNeighbors 
-        ? currentTerritory.coastalNeighbors.find((n) => n.to === target) !== undefined 
-        : false
-    return landNeighbor  || seaNeighbor
+    const currentTerritory = territories.find((t) => t.name === origin);
+    const landNeighbor = currentTerritory.neighbors.find((n) => n.to === target) !== undefined;
+    const seaNeighbor = currentTerritory.coastalNeighbors
+        ? currentTerritory.coastalNeighbors.find((n) => n.to === target) !== undefined
+        : false;
+    return landNeighbor || seaNeighbor;
 }
 
+export function territoryIsContested(territory: TerritoryDefinition, orders: Order[]): boolean {
+    const contestants = orders.filter(order => {
+        return order.type === OrderType.MOVE && order.target === territory.name
+    }).length
+
+    return contestants > 1;
+}
+
+export function getDefinitionsFromNeighbors(neighbors: TerritoryNeighborDefinition[]) : TerritoryDefinition[] {
+    return neighbors.map(n => {
+        return territories.find(t => t.name === n.to)
+    })
+}

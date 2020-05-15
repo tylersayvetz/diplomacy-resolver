@@ -41,7 +41,6 @@ export function validMoveByConvoy(order: MoveOrder, territories: TerritoryDefini
     //see if there is a water path between the origin and the target.
     const originTerritory = territories.find((t) => t.name === order.origin);
     if (!originTerritory) return false;
-    // console.log('origin territory:', originTerritory);
 
     const queue = [originTerritory];
     while (queue.length) {
