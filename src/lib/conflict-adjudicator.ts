@@ -44,7 +44,8 @@ export function buildTerritoryStatusesFromOrders(orders: Order[], territoryDefin
 
         //
         const supports = orders.filter(order => {
-            
+            //TODO: the next thing I was going to do was....
+            // find all the support moves that affect this orderStatus
         })
         
         //set the information. 
