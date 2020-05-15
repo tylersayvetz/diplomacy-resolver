@@ -229,7 +229,7 @@ describe('returns a map of the board showing contested territories.', () => {
         };
         expect(boardState).to.eql(expectedState);
     });
-    it('when a country moves into a territory occupied by it\'s own holding unit...', () => {
+    it("when a country moves into a territory occupied by it's own holding unit...", () => {
         const orders: Order[] = [
             { type: OrderType.HOLD, country: 'C1', origin: 'D', unit: UnitType.ARMY },
             {
@@ -290,16 +290,16 @@ describe('returns a map of the board showing contested territories.', () => {
         expect(boardState).to.eql(expectedState);
     });
 
-    xit ('**warning composite test** .  when a unit moves into a territory whose order was cancelled, it should be a conflict.  ', () => {
-      //coding this will be......... hmm. This is a composit test !!! 
+    xit('**warning composite test** .  when a unit moves into a territory whose order was cancelled, it should be a conflict.  ', () => {
+        //coding this will be......... hmm. This is a composit test !!!
     });
+});
 
-    describe('resolveConflictedTerritory()', () => {
-        describe('getRelativeWeight()', () => {
-            it ('should return 1 if the order is unsupported MOVE', () => {
-                const order: MoveOrder = {type: OrderType.MOVE, origin: 'A', target: 'B' }
-                
-            });
-        })
+describe('resolveConflictedTerritory()', () => {
+    describe('getRelativeWeight()', () => {
+        it('should return 1 if the order is unsupported MOVE', () => {
+            const order: MoveOrder = { type: OrderType.MOVE, origin: 'A', target: 'B', success: true };
+
+        });
     });
 });

@@ -14,10 +14,8 @@ import {
     validateAbstractOrder
 } from '../resolver';
 import { expect } from 'chai';
-import { hasNeighbor } from '../util/util';
-import { validMoveByConvoy } from '../util/order-validators';
-
-
+import { hasNeighbor } from '../lib/util';
+import { validMoveByConvoy } from '../lib/order-validators';
 
 //   +---------------+----+
 //   |       |  sea  |    |
@@ -109,7 +107,14 @@ export const territories: TerritoryDefinition[] = [
 describe('maps initial board state', () => {
     it('returns a map of the board, showing territories as occupied or not', () => {
         const orders: Order[] = [
-            { type: OrderType.MOVE, country: 'C2', origin: 'B', target: 'C', unit: UnitType.ARMY }
+            {
+                type: OrderType.MOVE,
+                country: 'C2',
+                origin: 'B',
+                target: 'C',
+                unit: UnitType.ARMY,
+                success: true
+            }
         ];
 
         const boardState = deriveInitialBoardStateFromOrders(orders, territories);
@@ -125,13 +130,21 @@ describe('maps initial board state', () => {
 
     it('returns a map of the board, using two orders, showing territories as occupied or not', () => {
         const orders: Order[] = [
-            { type: OrderType.MOVE, country: 'C2', origin: 'B', target: 'C', unit: UnitType.ARMY },
+            {
+                type: OrderType.MOVE,
+                country: 'C2',
+                origin: 'B',
+                target: 'C',
+                unit: UnitType.ARMY,
+                success: true
+            },
             {
                 type: OrderType.SUPPORT_HOLD,
                 country: 'C1',
                 origin: 'D',
                 target: 'B',
-                unit: UnitType.ARMY
+                unit: UnitType.ARMY,
+                success: true
             }
         ];
 
@@ -153,7 +166,8 @@ describe('maps initial board state', () => {
                 country: 'C1',
                 origin: 'D',
                 target: 'C',
-                unit: UnitType.ARMY
+                unit: UnitType.ARMY,
+                success: true
             };
             expect(validateAbstractOrder(order, territories)).to.equal(true);
         });
@@ -163,7 +177,8 @@ describe('maps initial board state', () => {
                 country: 'C1',
                 origin: 'E',
                 target: 'C',
-                unit: UnitType.ARMY
+                unit: UnitType.ARMY,
+                success: true
             };
             expect(validateAbstractOrder(order, territories)).to.equal(false);
         });
@@ -174,7 +189,8 @@ describe('maps initial board state', () => {
                 country: 'C1',
                 origin: 'D',
                 target: 'C',
-                unit: UnitType.ARMY
+                unit: UnitType.ARMY,
+                success: true
             };
             expect(validateAbstractOrder(order, territories)).to.equal(true);
         });
@@ -184,7 +200,8 @@ describe('maps initial board state', () => {
                 country: 'C1',
                 origin: 'D',
                 target: 'A',
-                unit: UnitType.ARMY
+                unit: UnitType.ARMY,
+                success: true
             };
             expect(validateAbstractOrder(order, territories)).to.equal(false);
         });
@@ -196,7 +213,8 @@ describe('maps initial board state', () => {
                 origin: 'E',
                 target: 'D',
                 into: 'B',
-                unit: UnitType.ARMY
+                unit: UnitType.ARMY,
+                success: true
             };
             expect(validateAbstractOrder(order, territories)).to.equal(true);
         });
@@ -207,7 +225,8 @@ describe('maps initial board state', () => {
                 origin: 'A',
                 target: 'D',
                 into: 'C',
-                unit: UnitType.ARMY
+                unit: UnitType.ARMY,
+                success: true
             };
             expect(validateAbstractOrder(order, territories)).to.equal(false);
         });
@@ -220,7 +239,8 @@ describe('maps initial board state', () => {
                 country: 'C1',
                 origin: 'D',
                 target: 'C',
-                unit: UnitType.ARMY
+                unit: UnitType.ARMY,
+                success: true
             };
             expect(hasNeighbor(order.origin, order.target, territories)).to.equal(true);
         });
@@ -230,7 +250,8 @@ describe('maps initial board state', () => {
                 country: 'C1',
                 origin: 'B',
                 target: 'C',
-                unit: UnitType.ARMY
+                unit: UnitType.ARMY,
+                success: true
             };
             expect(hasNeighbor(order.origin, order.target, territories)).to.equal(false);
         });
@@ -243,7 +264,8 @@ describe('maps initial board state', () => {
                 country: 'C1',
                 origin: 'E',
                 target: 'A',
-                unit: UnitType.ARMY
+                unit: UnitType.ARMY,
+                success: true
             };
             expect(validMoveByConvoy(order, territories)).to.equal(true);
         });

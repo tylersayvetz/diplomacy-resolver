@@ -11,8 +11,8 @@ import {
     isTargettingTerritory
     // validateConvoy,
     // validateHold,
-} from './util/util';
-import { validateMove, validateSupportHold, validateSupportMove } from './util/order-validators';
+} from './lib/util';
+import { validateMove, validateSupportHold, validateSupportMove } from './lib/order-validators';
 import { OrderType } from './const';
 
 /**

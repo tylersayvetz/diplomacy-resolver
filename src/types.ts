@@ -1,18 +1,41 @@
-import { TerritoryType, OrderType, UnitType } from "./const";
+import { TerritoryType, OrderType, UnitType } from './const';
 
+//this is the reference. It is static information about the map.
 export interface TerritoryDefinition {
     name: string;
     type: TerritoryType;
     country: string;
-    neighbors: TerritoryNeighborDefinition[],
-    coastalNeighbors: TerritoryNeighborDefinition[] | null
+    neighbors: TerritoryNeighborDefinition[];
+    coastalNeighbors: TerritoryNeighborDefinition[] | null;
 }
 
+export interface TerritoryStatus {
+    territory: TerritoryDefinition;
+    contested: boolean;
+    contestants: Contestant[] | null;
+    occupant: OrderStatus | null;
+}
+
+export type ConvoyRoute = TerritoryStatus[][];
+
+export interface Contestant {
+    convoyRoutes?: ConvoyRoute | null;
+    territory: TerritoryStatus;
+}
+
+export interface OrderStatus {
+    order: Order;
+    resolution: boolean | null;
+    convoyRoutes: ConvoyRoute | null;
+    supports: TerritoryStatus[];
+}
+
+
 export interface BoardState {
-    [name: string]: {
-        occupied: boolean
-        contested?: boolean
-    }
+    [territoryName: string]: {
+        occupied: boolean;
+        contested: boolean;
+    };
 }
 
 export interface TerritoryNeighborDefinition {
@@ -22,10 +45,11 @@ export interface TerritoryNeighborDefinition {
 }
 
 export interface AbstractOrder {
-    type: OrderType,
-    country: string,
-    origin: string,
-    unit: UnitType
+    type: OrderType;
+    country: string;
+    origin: string;
+    unit: UnitType;
+    success: boolean;
 }
 
 export interface HoldOrder extends AbstractOrder {
@@ -57,4 +81,11 @@ export interface ConvoyOrder extends AbstractOrder {
     into: string;
 }
 
-export type Order = HoldOrder | MoveOrder | SupportMoveOrder | SupportHoldOrder | BuildOrder | ConvoyOrder | DestroyOrder;
+export type Order =
+    | HoldOrder
+    | MoveOrder
+    | SupportMoveOrder
+    | SupportHoldOrder
+    | BuildOrder
+    | ConvoyOrder
+    | DestroyOrder;
